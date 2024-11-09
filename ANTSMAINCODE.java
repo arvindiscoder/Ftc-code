@@ -230,6 +230,11 @@
 
                     hangingAngle.setPower(0.7 * gamepad2.right_trigger - gamepad2.left_trigger);
                 } else {
+                    if(angle.getCurrentPosition){
+                        if(extension.getCurrentPosition < 3500){
+                            
+                        }
+                    }
                     extension.setPower(extensionpower);
                     extensionPosition = extension.getCurrentPosition();
                 }

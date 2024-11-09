@@ -63,6 +63,7 @@ public class prototype extends LinearOpMode {
             leftFrontDrive.setPower(0.5);
             rightBackDrive.setPower(0.5);
             leftFrontDrive.setPower(0.5);
+            sleep(5000);
 
 
         }

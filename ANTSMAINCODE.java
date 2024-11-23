@@ -1,5 +1,7 @@
 
     package org.firstinspires.ftc.teamcode;
+    import android.graphics.Camera;
+
     import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
     import com.qualcomm.hardware.rev.RevTouchSensor;
     import com.qualcomm.robotcore.hardware.CRServo;
@@ -25,8 +27,9 @@
         private CRServo leftintake;
         private DcMotor extension = null;
         private DcMotor angle = null;
-        private DcMotor hangingAngle = null;
-        private DcMotor hangingExtension = null;
+
+        private Camera camera;
+//
 
         private RevTouchSensor nehal = null;
         @Override
@@ -43,8 +46,9 @@
             angle = hardwareMap.get(DcMotor.class,"angle");
             extension = hardwareMap.get(DcMotor.class,"extension");
             nehal = hardwareMap.get(RevTouchSensor.class, "nehal");
-            hangingAngle = hardwareMap.get(DcMotor.class,"hangingAngle");
-            hangingExtension = hardwareMap.get(DcMotor.class, "hangingExtension");
+//            hangingAngle = hardwareMap.get(DcMotor.class,"hangingAngle");
+//            hangingExtension = hardwareMap.get(DcMotor.class, "hangingExtension");
+            camera = hardwareMap.get(Camera.class, "camera");
 
 
             // ########################################################################################
@@ -70,18 +74,17 @@
             // run until the end of the match (driver presses STOP)
             int desiredPosition = angle.getCurrentPosition();
             int extensionPosition = extension.getCurrentPosition();
-            int adit = hangingAngle.getCurrentPosition();
-            int eric = hangingExtension.getCurrentPosition();
+//            int adit = hangingAngle.getCurrentPosition();
+//            int eric = hangingExtension.getCurrentPosition();
             boolean counter = false;
             while (opModeIsActive()) {
-                telemetry.addData("Roan says ", "I wanna molest atremus velasco because hes mean to me unghhhhhhhhh");
 
                 double max;
 //                double max2;
 
-                double axial   =  -gamepad1.left_stick_y;
+                double axial   =  -0.8 * gamepad1.left_stick_y;
                 double lateral =  gamepad1.left_stick_x;
-                double yaw     =  gamepad1.right_stick_x;
+                double yaw     =  0.5 * gamepad1.right_stick_x;
 
                 double lateral2 = gamepad2.left_trigger - gamepad2.right_trigger;
 
@@ -144,14 +147,15 @@
                 }
 
 
-                    telemetry.addData("angle position", angle.getCurrentPosition());
                     telemetry.addData("extension position", extension.getCurrentPosition());
                     telemetry.addData("stick position", gamepad2.left_stick_y);
                     telemetry.addData("extension power", extension.getPower());
                     telemetry.addData("angle power", angle.getPower());
                     telemetry.addData("extension variable value", extensionPosition);
-                    telemetry.addData("eric value (extension)", eric);
-                    telemetry.addData("hanging extension position", hangingExtension.getCurrentPosition());
+//                    telemetry.addData("eric value (extension)", eric);
+//                    telemetry.addData("hanging extension position", hangingExtension.getCurrentPosition());
+                    telemetry.addData("angle position", angle.getCurrentPosition());
+                    telemetry.addData("desired", desiredPosition);
                     telemetry.update();
 
 
@@ -159,24 +163,32 @@
 
                 //if the touch sensor(white button) is pressed, arm goes back down
 
-                if(nehal.isPressed()){
-                    desiredPosition -= 30;
-                } else {
+                //if(nehal.isPressed()){
+                //    desiredPosition -= 30;
+                //} else {
                     //affects where the motor has to go when the user moves the right stick
                     if(gamepad2.right_stick_button){
-                        desiredPosition += -10 * gamepad2.right_stick_y;
+                        desiredPosition += -5 * gamepad2.right_stick_y;
                     } else {
-                        desiredPosition += -70 * gamepad2.right_stick_y;
+                        desiredPosition += -30 * gamepad2.right_stick_y;
                     }
+////
+//                    angle.setPower(gamepad2.right_stick_y+0.2);
+//                    String val = String.valueOf(gamepad2.right_stick_y);
+//                    telemetry.addData("controllervalue",val);
+//                    telemetry.update();
+//                    angle.setTargetPosition(desiredPosition);
+//                    angle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////
+//                    if(angle.getCurrentPosition() == desiredPosition){
+//                        angle.setPower(0);
+//                    } else {
+//                        angle.setPower(1);
+//                    }
+                angle.setPower(-gamepad2.right_stick_y);
 
-                    angle.setTargetPosition(desiredPosition);
-                    angle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 
-                    if(angle.getCurrentPosition() == desiredPosition){
-                        angle.setPower(0);
-                    } else {
-                        angle.setPower(1);
-                    }
+
 //                    if(angle.getCurrentPosition() > desiredPosition){
 //                        angle.setPower(0.5);
 //                    } else {
@@ -186,7 +198,7 @@
 //                        desiredPosition = angle.getCurrentPosition();
 //                    }
 
-                }
+            //    }
 
 
                 //left trigger - right trigger
@@ -199,45 +211,48 @@
                 } else if (gamepad1.y){
                     counter = false;
                 }
-                if(counter) {
-                    extensionPosition += -30 * gamepad2.left_stick_y;
-                    extension.setTargetPosition(extensionPosition);
-                    extension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-                    //when to move and when to not move
-                    if (extension.getCurrentPosition() == extensionPosition) {
-                        extension.setPower(0);
-                    } else {
-                        extension.setPower(5);
-                    }
-
-
-                    if(gamepad2.left_bumper){
-                        hangingExtension.setPower(1);
-                    } else if (gamepad2.right_bumper){
-                        hangingExtension.setPower(-1);
-                    } else {
-                        hangingExtension.setPower(0);
-                    }
-//                    hangingExtension.setTargetPosition(eric);
-//                    hangingExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//                if(counter) {
+//                    extensionPosition += -30 * gamepad2.left_stick_y;
+//                    extension.setTargetPosition(extensionPosition);
+//                    extension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
 //                    //when to move and when to not move
-//                    if (hangingExtension.getCurrentPosition() == eric) {
-//                        hangingExtension.setPower(0);
+//                    if (extension.getCurrentPosition() == extensionPosition) {
+//                        extension.setPower(0);
 //                    } else {
-//                        hangingExtension.setPower(1);
+//                        extension.setPower(1);
 //                    }
+//
+//
+//                    if(gamepad2.left_bumper){
+//                        hangingExtension.setPower(1);
+//                    } else if (gamepad2.right_bumper){
+//                        hangingExtension.setPower(-1);
+//                    } else {
+//                        hangingExtension.setPower(0);
+//                    }
+////                    hangingExtension.setTargetPosition(eric);
+////                    hangingExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+////                    //when to move and when to not move
+////                    if (hangingExtension.getCurrentPosition() == eric) {
+////                        hangingExtension.setPower(0);
+////                    } else {
+////                        hangingExtension.setPower(1);
+////                    }
+//
+//
+//                    hangingAngle.setPower(0.7 * gamepad2.right_trigger - gamepad2.left_trigger);
+//                } else {
+                    //if(angle.getCurrentPosition() > 0) {
+                        extension.setPower(extensionpower);
+                        extensionPosition = extension.getCurrentPosition();
+                    //}
+//                }
 
-
-                    hangingAngle.setPower(0.7 * gamepad2.right_trigger - gamepad2.left_trigger);
-                } else {
-                    if(angle.getCurrentPosition){
-                        if(extension.getCurrentPosition < 3500){
-                            
-                        }
-                    }
-                    extension.setPower(extensionpower);
-                    extensionPosition = extension.getCurrentPosition();
-                }
+//                if(angle.getCurrentPosition() < 0){
+//                    if(extension.getCurrentPosition() > -3000){
+//                        extension.setPower(0);
+//                    }
+//                }
             }
         }
     }

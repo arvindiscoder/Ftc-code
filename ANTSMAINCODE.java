@@ -1,6 +1,6 @@
 
     package org.firstinspires.ftc.teamcode;
-    import android.graphics.Camera;
+       // import android.graphics.`Camera`;
 
     import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
     import com.qualcomm.hardware.rev.RevTouchSensor;
@@ -22,16 +22,19 @@
         private DcMotor leftBackDrive = null;
         private DcMotor rightFrontDrive = null;
         private DcMotor rightBackDrive = null;
+       // private DcMotor test = null;
 
-        private CRServo rightintake;
-        private CRServo leftintake;
+//        private CRServo rightintake;
+//        private CRServo leftintake;
         private DcMotor extension = null;
         private DcMotor angle = null;
+        //private DcMotor test = null;
 
-        private Camera camera;
+
+     //   private Camera camera;
 //
 
-        private RevTouchSensor nehal = null;
+     //   private RevTouchSensor nehal = null;
         @Override
         public void runOpMode() {
 
@@ -41,14 +44,15 @@
             leftBackDrive  = hardwareMap.get(DcMotor.class, "bleft");
             rightFrontDrive = hardwareMap.get(DcMotor.class, "frontright");
             rightBackDrive = hardwareMap.get(DcMotor.class, "backright");
-            rightintake = hardwareMap.get(CRServo.class,"rightintake");
-            leftintake = hardwareMap.get(CRServo.class,"leftintake");
+        //    rightintake = hardwareMap.get(CRServo.class,"rightintake");
+          //  leftintake = hardwareMap.get(CRServo.class,"leftintake");
             angle = hardwareMap.get(DcMotor.class,"angle");
             extension = hardwareMap.get(DcMotor.class,"extension");
-            nehal = hardwareMap.get(RevTouchSensor.class, "nehal");
+   //         nehal = hardwareMap.get(RevTouchSensor.class, "nehal");
 //            hangingAngle = hardwareMap.get(DcMotor.class,"hangingAngle");
 //            hangingExtension = hardwareMap.get(DcMotor.class, "hangingExtension");
-            camera = hardwareMap.get(Camera.class, "camera");
+    //        camera = hardwareMap.get(Camera.class, "camera");
+//            test = hardwareMap.get(DcMotor.class, "testing");
 
 
             // ########################################################################################
@@ -61,7 +65,7 @@
             // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
             // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
             // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-            leftFrontDrive.setDirection(DcMotor.Direction.REVERSE);
+            leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
             leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
             rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
             rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
@@ -82,8 +86,10 @@
                 double max;
 //                double max2;
 
-                double axial   =  -0.8 * gamepad1.left_stick_y;
-                double lateral =  gamepad1.left_stick_x;
+                //double axial   =  -0.8 * gamepad1.left_stick_y;
+                double axial = gamepad1.left_stick_y;
+                double lateral = 0.1;
+                //double lateral =  gamepad1.left_stick_x;
                 double yaw     =  0.5 * gamepad1.right_stick_x;
 
                 double lateral2 = gamepad2.left_trigger - gamepad2.right_trigger;
@@ -91,8 +97,8 @@
                 // axial is forward backward
                 // lateral is side to side
                 // yaw is angle
-                double leftFrontPower  = axial + lateral + yaw;
-                double rightFrontPower = axial - lateral - yaw;
+                double leftFrontPower  = axial - lateral + yaw;
+                double rightFrontPower = axial + lateral - yaw;
                 double leftBackPower   = axial - lateral + yaw;
                 double rightBackPower  = axial + lateral - yaw;
 
@@ -127,6 +133,9 @@
 //
 //                }
                 double extensionpower = gamepad2.left_stick_y;
+                double skibidi = 1;
+
+
 
                 leftFrontDrive.setPower(leftFrontPower);
                 rightFrontDrive.setPower(rightFrontPower);
@@ -135,17 +144,26 @@
 
 
 
-                if(gamepad2.a){
-                    rightintake.setPower(1);
-                    leftintake.setPower(-1);
-                } else if (gamepad2.b){
-                    rightintake.setPower(-1);
-                    leftintake.setPower(1);
-                } else {
-                    rightintake.setPower(0);
-                    leftintake.setPower(0);
+//                if(gamepad2.a){
+  //                  rightintake.setPower(1);
+    //                leftintake.setPower(-1);
+      //          } else if (gamepad2.b){
+        //            rightintake.setPower(-1);
+          //          leftintake.setPower(1);
+            //    } else {
+              //      rightintake.setPower(0);
+                //    leftintake.setPower(0);
                 }
+            double skibidi = 1;
 
+//            if (gamepad1.a == true){
+//
+//                    skibidi = -1;
+//
+//                }else if (gamepad1.b = true){
+//                    skibidi = -1;
+//                }
+//                test.setPower(gamepad1.right_stick_y * skibidi);
 
                     telemetry.addData("extension position", extension.getCurrentPosition());
                     telemetry.addData("stick position", gamepad2.left_stick_y);
@@ -243,7 +261,9 @@
 //                    hangingAngle.setPower(0.7 * gamepad2.right_trigger - gamepad2.left_trigger);
 //                } else {
                     //if(angle.getCurrentPosition() > 0) {
-                        extension.setPower(extensionpower);
+            double extensionpower = gamepad2.left_stick_y;
+
+            extension.setPower(extensionpower);
                         extensionPosition = extension.getCurrentPosition();
                     //}
 //                }
@@ -255,4 +275,4 @@
 //                }
             }
         }
-    }
+

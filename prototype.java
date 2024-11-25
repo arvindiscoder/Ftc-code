@@ -38,32 +38,63 @@ public class prototype extends LinearOpMode {
         leftFrontDrive = hardwareMap.get(DcMotor.class, "fleft");
         leftBackDrive  = hardwareMap.get(DcMotor.class, "bleft");
         rightBackDrive = hardwareMap.get(DcMotor.class, "backright");
-//        int x = 0;
-//        x = x+1;
-//
-//        if(x == 2){
-//
-//            rightFrontDrive.setPower(1);
+        int x = 0;
+        x = x+1;
+
+ //       if(x == 2){
+
+            rightFrontDrive.setPower(1);
         while(opModeIsActive()){
-            //forward auto
-            rightFrontDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(-0.5);
-            leftBackDrive.setPower(0.5);
-            sleep(5000);
+            double max;
 
-            //back auto
-            rightFrontDrive.setPower(-0.5);
-            leftFrontDrive.setPower(-0.5);
-            rightBackDrive.setPower(0.5);
-            leftBackDrive.setPower(-0.5);
-            sleep(5000);
 
-            rightFrontDrive.setPower(-0.5);
-            leftFrontDrive.setPower(0.5);
-            rightBackDrive.setPower(0.5);
-            leftFrontDrive.setPower(0.5);
+            double axial   =  0;
+            double lateral =  0;
+            double yaw     =  0;
+
+            axial = 20;
+
             sleep(5000);
+           // axial = -20;
+            // axial is forward to backward
+            // lateral is side to side
+            // yaw is angle
+            double leftFrontPower  = axial + lateral + yaw;
+            double rightFrontPower = axial - lateral - yaw;
+            double leftBackPower   = axial - lateral + yaw;
+            double rightBackPower  = axial + lateral - yaw;
+
+
+
+            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
+            max = Math.max(max, Math.abs(leftBackPower));
+            max = Math.max(max, Math.abs(rightBackPower));
+            max = Math.max(max, Math.abs((gamepad1.right_trigger - gamepad1.left_trigger)*0.5));
+            if (max > 1.0) {
+                leftFrontPower  /= max; //leftFrontPower = leftFrontPower / max
+                rightFrontPower /= max;
+                leftBackPower   /= max;
+                rightBackPower  /= max;
+
+
+            }
+
+
+            leftFrontDrive.setPower(leftFrontPower);
+            rightFrontDrive.setPower(rightFrontPower);
+            leftBackDrive.setPower(leftBackPower);
+            rightBackDrive.setPower(rightBackPower);
+
+
+            if(x == 2){
+
+                rightintake.setPower(0.2);
+                leftintake.setPower(-0.2);
+
+            }
+
+
+
 
             int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
        //     OpenCvCamera camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);

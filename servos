@@ -1,0 +1,72 @@
+package org.firstinspires.ftc.teamcode;
+
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.hardware.CRServo;
+
+import android.graphics.Camera;
+
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
+import com.qualcomm.hardware.rev.RevTouchSensor;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.HardwareMap;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.hardware.TouchSensor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+
+@TeleOp(name = "claw test")
+public class servos extends LinearOpMode{
+
+    private ElapsedTime runtime = new ElapsedTime();
+
+    public Servo rclaw;
+    public Servo lclaw;
+
+    @Override
+    public void runOpMode(){
+
+
+        rclaw = hardwareMap.get(Servo.class, "rintake");
+        lclaw = hardwareMap.get(Servo.class, "lintake");
+
+        waitForStart();
+        runtime.reset();
+
+        int x = (int)0;
+
+
+
+        telemetry.update();
+        while (opModeIsActive()){
+            x= x+1;
+
+
+            if (gamepad1.b){
+
+
+                rclaw.setPosition(0.90);
+                lclaw.setPosition(0.35);
+
+
+
+            }
+            if (gamepad1.a){
+
+
+                rclaw.setPosition(0);
+                lclaw.setPosition(0);
+
+
+            }
+
+
+        }
+
+
+    }
+
+
+}

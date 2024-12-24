@@ -1,278 +1,193 @@
 
-    package org.firstinspires.ftc.teamcode;
-       // import android.graphics.`Camera`;
+package org.firstinspires.ftc.teamcode;
+// import android.graphics.`Camera`;
 
-    import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
-    import com.qualcomm.hardware.rev.RevTouchSensor;
-    import com.qualcomm.robotcore.hardware.CRServo;
-    import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
-    import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-    import com.qualcomm.robotcore.hardware.DcMotor;
-    import com.qualcomm.robotcore.hardware.DcMotorSimple;
-    import com.qualcomm.robotcore.hardware.TouchSensor;
-    import com.qualcomm.robotcore.util.ElapsedTime;
+import android.graphics.Camera;
 
-    @TeleOp(name="ANTSMAINCODE", group="Linear OpMode")
+import com.qualcomm.hardware.modernrobotics.ModernRoboticsTouchSensor;
+import com.qualcomm.hardware.rev.RevTouchSensor;
+import com.qualcomm.robotcore.hardware.CRServo;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Servo;
+import com.qualcomm.robotcore.util.ElapsedTime;
 
-    public class ANTSMAINCODE extends LinearOpMode {
+@TeleOp(name = "ANTSMAINCODE", group = "Linear OpMode")
 
-        // Declare OpMode members for each of the 4 motors.
-        private ElapsedTime runtime = new ElapsedTime();
-        private DcMotor leftFrontDrive = null;
-        private DcMotor leftBackDrive = null;
-        private DcMotor rightFrontDrive = null;
-        private DcMotor rightBackDrive = null;
-       // private DcMotor test = null;
+public class ANTSMAINCODE extends LinearOpMode {
 
-//        private CRServo rightintake;
-//        private CRServo leftintake;
-        private DcMotor extension = null;
-        private DcMotor angle = null;
-        //private DcMotor test = null;
+    // Declare OpMode members for each of the 4 motors.
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor backleft = null;
+    private DcMotor frontleft = null;
+    private DcMotor backright = null;
+    private DcMotor frontright = null;
+    private DcMotor rightintakeslide = null;
+    private DcMotor leftintakeslide = null;
 
 
-     //   private Camera camera;
+    private DcMotor specimenslide = null;
+
+    private CRServo rightintake = null;
+
+    private CRServo leftintake = null;
+    private Servo heightservo = null;
+
+    private Servo claw = null;
+
+
+    private Camera camera;
+
+
+    //   private Camera camera;
+
+    @Override
+    public void runOpMode() {
+
+        // Initialize the hardware variables. Note that the strings used here must correspond
+
+        // to the names assigned during the robot configuration step on the DS or RC devices.
+        telemetry.addData("version ", "14");
+
+        backright = hardwareMap.get(DcMotor.class, "frontright");
+        frontright = hardwareMap.get(DcMotor.class, "backright");
+        backleft = hardwareMap.get(DcMotor.class, "frontleft");
+        frontleft = hardwareMap.get(DcMotor.class, "backleft");
+
+        specimenslide = hardwareMap.get(DcMotor.class, "specimenslide");
+        rightintakeslide = hardwareMap.get(DcMotor.class, "rightslideintake");
+        leftintakeslide = hardwareMap.get(DcMotor.class, "leftslideintake");
+        rightintake = hardwareMap.get(CRServo.class, "rightintake");
+        leftintake = hardwareMap.get(CRServo.class, "leftintake");
+        heightservo = hardwareMap.get(Servo.class, "heightservo");
+        claw = hardwareMap.get(Servo.class,"claw");
+
+
+        frontleft.setDirection(DcMotor.Direction.REVERSE);
+        frontright.setDirection(DcMotor.Direction.FORWARD);
+        backleft.setDirection(DcMotor.Direction.REVERSE);
+        backright.setDirection(DcMotor.Direction.FORWARD);
+
+        telemetry.update();
+
+        waitForStart();
+        runtime.reset();
+
+        long initialTime = System.currentTimeMillis();
+        long endTime = System.currentTimeMillis();
+
+
+        specimenslide.setDirection(DcMotorSimple.Direction.REVERSE);
+//        specimenslide.setTargetPosition(-1000);
+//        specimenslide.setPower(0.4);
+//        while (specimenslide.isBusy()){
+//        }
+//        specimenslide.setPower(0);
+
+
+        // initilization of the 0 position of the specimenslide
+//        while (true) {
+//            endTime = System.currentTimeMillis();
 //
+//            if (endTime - initialTime < 20) {
+//                specimenslide.setPower(1);
+//            } else {
+//                specimenslide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+//                break;
+//            }
+//        }
+        // creation of tuning variables
 
-     //   private RevTouchSensor nehal = null;
-        @Override
-        public void runOpMode() {
+        double specimenslideminimum = 100;
+        double specimenslidemaximum = 1000;
+        double controllersensitivity = 30;
+        double powersensitivy = 0.01;
 
-            // Initialize the hardware variables. Note that the strings used here must correspond
-            // to the names assigned during the robot configuration step on the DS or RC devices.
-            leftFrontDrive  = hardwareMap.get(DcMotor.class, "fleft");
-            leftBackDrive  = hardwareMap.get(DcMotor.class, "bleft");
-            rightFrontDrive = hardwareMap.get(DcMotor.class, "frontright");
-            rightBackDrive = hardwareMap.get(DcMotor.class, "backright");
-        //    rightintake = hardwareMap.get(CRServo.class,"rightintake");
-          //  leftintake = hardwareMap.get(CRServo.class,"leftintake");
-            angle = hardwareMap.get(DcMotor.class,"angle");
-            extension = hardwareMap.get(DcMotor.class,"extension");
-   //         nehal = hardwareMap.get(RevTouchSensor.class, "nehal");
-//            hangingAngle = hardwareMap.get(DcMotor.class,"hangingAngle");
-//            hangingExtension = hardwareMap.get(DcMotor.class, "hangingExtension");
-    //        camera = hardwareMap.get(Camera.class, "camera");
-//            test = hardwareMap.get(DcMotor.class, "testing");
+        // creation of non tuning variables
+
+        double targetposition = specimenslideminimum;
+        double specimenslidepower = 0;
 
 
-            // ########################################################################################
-            // !!!            IMPORTANT Drive Information. Test your motor directions.            !!!!!
-            // ########################################################################################
-            // Most robots need the motors on one side to be reversed to drive forward.
-            // The motor reversals shown here are for a "direct drive" robot (the wheels turn the same direction as the motor shaft)
-            // If your robot has additional gear reductions or uses a right-angled drive, it's important to ensure
-            // that your motors are turning in the correct direction.  So, start out with the reversals here, BUT
-            // when you first test your robot, push the left joystick forward and observe the direction the wheels turn.
-            // Reverse the direction (flip FORWARD <-> REVERSE ) of any wheel that runs backward
-            // Keep testing until ALL the wheels move the robot forward when you push the left joystick forward.
-            leftFrontDrive.setDirection(DcMotor.Direction.FORWARD);
-            leftBackDrive.setDirection(DcMotor.Direction.REVERSE);
-            rightFrontDrive.setDirection(DcMotor.Direction.REVERSE);
-            rightBackDrive.setDirection(DcMotor.Direction.FORWARD);
+        while (opModeIsActive()) {
 
-            // Wait for the game to start (driver presses PLAY)
-
-            waitForStart();
-            runtime.reset();
-
-            // run until the end of the match (driver presses STOP)
-            int desiredPosition = angle.getCurrentPosition();
-            int extensionPosition = extension.getCurrentPosition();
-//            int adit = hangingAngle.getCurrentPosition();
-//            int eric = hangingExtension.getCurrentPosition();
-            boolean counter = false;
-            while (opModeIsActive()) {
-
-                double max;
-//                double max2;
-
-                //double axial   =  -0.8 * gamepad1.left_stick_y;
-                double axial = gamepad1.left_stick_y;
-                double lateral = 0.1;
-                //double lateral =  gamepad1.left_stick_x;
-                double yaw     =  0.5 * gamepad1.right_stick_x;
-
-                double lateral2 = gamepad2.left_trigger - gamepad2.right_trigger;
-
-                // axial is forward backward
-                // lateral is side to side
-                // yaw is angle
-                double leftFrontPower  = axial - lateral + yaw;
-                double rightFrontPower = axial + lateral - yaw;
-                double leftBackPower   = axial - lateral + yaw;
-                double rightBackPower  = axial + lateral - yaw;
-
-//                double leftFrontPower2 = lateral2;
-//                double rightFrontPower2 = -lateral2;
-//                double leftBackPower2 = -lateral2;
-//                double rightBackPower2 = lateral2;
-
-                double anglepower = -gamepad2.left_stick_y;
-
-                max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-                max = Math.max(max, Math.abs(leftBackPower));
-                max = Math.max(max, Math.abs(rightBackPower));
-                max = Math.max(max, Math.abs((gamepad1.right_trigger - gamepad1.left_trigger)*0.5));
-                if (max > 1.0) {
-                    leftFrontPower  /= max; //leftFrontPower = leftFrontPower / max
-                    rightFrontPower /= max;
-                    leftBackPower   /= max;
-                    rightBackPower  /= max;
-
-                }
-
-//                max2 = Math.max(Math.abs(leftFrontPower2), Math.abs(rightFrontPower2));
-//                max2 = Math.max(max, Math.abs(leftBackPower2));
-//                max2 = Math.max(max, Math.abs(rightBackPower2));
-//                max2 = Math.max(max, Math.abs((gamepad1.right_trigger - gamepad1.left_trigger)*0.5));
-//                if (max2 > 1.0) {
-//                    leftFrontPower  /= max2; //leftFrontPower = leftFrontPower / max
-//                    rightFrontPower /= max2;
-//                    leftBackPower   /= max2;
-//                    rightBackPower  /= max2;
-//
-//                }
-                double extensionpower = gamepad2.left_stick_y;
-                double skibidi = 1;
-
-
-
-                leftFrontDrive.setPower(leftFrontPower);
-                rightFrontDrive.setPower(rightFrontPower);
-                leftBackDrive.setPower(leftBackPower);
-                rightBackDrive.setPower(rightBackPower);
-
-
-
-//                if(gamepad2.a){
-  //                  rightintake.setPower(1);
-    //                leftintake.setPower(-1);
-      //          } else if (gamepad2.b){
-        //            rightintake.setPower(-1);
-          //          leftintake.setPower(1);
-            //    } else {
-              //      rightintake.setPower(0);
-                //    leftintake.setPower(0);
-                }
-            double skibidi = 1;
-
-//            if (gamepad1.a == true){
-//
-//                    skibidi = -1;
-//
-//                }else if (gamepad1.b = true){
-//                    skibidi = -1;
-//                }
-//                test.setPower(gamepad1.right_stick_y * skibidi);
-
-                    telemetry.addData("extension position", extension.getCurrentPosition());
-                    telemetry.addData("stick position", gamepad2.left_stick_y);
-                    telemetry.addData("extension power", extension.getPower());
-                    telemetry.addData("angle power", angle.getPower());
-                    telemetry.addData("extension variable value", extensionPosition);
-//                    telemetry.addData("eric value (extension)", eric);
-//                    telemetry.addData("hanging extension position", hangingExtension.getCurrentPosition());
-                    telemetry.addData("angle position", angle.getCurrentPosition());
-                    telemetry.addData("desired", desiredPosition);
-                    telemetry.update();
-
-
-
-
-                //if the touch sensor(white button) is pressed, arm goes back down
-
-                //if(nehal.isPressed()){
-                //    desiredPosition -= 30;
-                //} else {
-                    //affects where the motor has to go when the user moves the right stick
-                    if(gamepad2.right_stick_button){
-                        desiredPosition += -5 * gamepad2.right_stick_y;
-                    } else {
-                        desiredPosition += -30 * gamepad2.right_stick_y;
-                    }
-////
-//                    angle.setPower(gamepad2.right_stick_y+0.2);
-//                    String val = String.valueOf(gamepad2.right_stick_y);
-//                    telemetry.addData("controllervalue",val);
-//                    telemetry.update();
-//                    angle.setTargetPosition(desiredPosition);
-//                    angle.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-////
-//                    if(angle.getCurrentPosition() == desiredPosition){
-//                        angle.setPower(0);
-//                    } else {
-//                        angle.setPower(1);
-//                    }
-                angle.setPower(-gamepad2.right_stick_y);
-
-
-
-//                    if(angle.getCurrentPosition() > desiredPosition){
-//                        angle.setPower(0.5);
-//                    } else {
-//                        angle.setPower(gamepad2.right_stick_y);
-//                    }
-//                    if(gamepad1.left_stick_button){
-//                        desiredPosition = angle.getCurrentPosition();
-//                    }
-
-            //    }
-
-
-                //left trigger - right trigger
-//                if (gamepad1.a){
-//                    rightintake.setPower(100);
-//                }
-
-                if(gamepad1.x){
-                    counter = true;
-                } else if (gamepad1.y){
-                    counter = false;
-                }
-//                if(counter) {
-//                    extensionPosition += -30 * gamepad2.left_stick_y;
-//                    extension.setTargetPosition(extensionPosition);
-//                    extension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-//                    //when to move and when to not move
-//                    if (extension.getCurrentPosition() == extensionPosition) {
-//                        extension.setPower(0);
-//                    } else {
-//                        extension.setPower(1);
-//                    }
-//
-//
-//                    if(gamepad2.left_bumper){
-//                        hangingExtension.setPower(1);
-//                    } else if (gamepad2.right_bumper){
-//                        hangingExtension.setPower(-1);
-//                    } else {
-//                        hangingExtension.setPower(0);
-//                    }
-////                    hangingExtension.setTargetPosition(eric);
-////                    hangingExtension.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-////                    //when to move and when to not move
-////                    if (hangingExtension.getCurrentPosition() == eric) {
-////                        hangingExtension.setPower(0);
-////                    } else {
-////                        hangingExtension.setPower(1);
-////                    }
-//
-//
-//                    hangingAngle.setPower(0.7 * gamepad2.right_trigger - gamepad2.left_trigger);
-//                } else {
-                    //if(angle.getCurrentPosition() > 0) {
-            double extensionpower = gamepad2.left_stick_y;
-
-            extension.setPower(extensionpower);
-                        extensionPosition = extension.getCurrentPosition();
-                    //}
-//                }
-
-//                if(angle.getCurrentPosition() < 0){
-//                    if(extension.getCurrentPosition() > -3000){
-//                        extension.setPower(0);
-//                    }
-//                }
+            if(gamepad2.a){
+                claw.setPosition(0.73);
+            } else if (gamepad2.b) {
+                claw.setPosition(0.8);
             }
+
+
+            // main movement code of the specimen slide
+            targetposition += (gamepad2.right_stick_y) * controllersensitivity;
+//            if (targetposition>specimenslidemaximum){
+//                targetposition = specimenslidemaximum;
+//            }
+//            if (targetposition < specimenslideminimum){
+//                targetposition = specimenslideminimum;
+//            }
+
+
+            specimenslidepower = powersensitivy * (targetposition - specimenslide.getCurrentPosition());
+
+
+            if (specimenslidepower > 1) {
+                specimenslidepower = 1;
+            } else if (specimenslidepower < -1) {
+                specimenslidepower = -1;
+            }
+            specimenslide.setPower(specimenslidepower);
+            telemetry.addData(Double.toString(specimenslidepower), "specimentSlidePower");
+            telemetry.addData(Double.toString(targetposition), "targetposition");
+            telemetry.addData(Double.toString(specimenslide.getCurrentPosition()), "currentposition");
+            telemetry.addData(Double.toString(targetposition - specimenslide.getCurrentPosition()), "calculateddifference");
+            telemetry.update();
+
+            //specimenslide.setPower(gamepad1.right_trigger-gamepad1.left_trigger);
+//            telemetry.addData(Integer.toString(specimenslide.getCurrentPosition()),"specimentSlicePosition" );
+//            telemetry.update();
+
+
+            double intakeslidepower = gamepad2.right_trigger - gamepad2.left_trigger;
+
+            rightintakeslide.setPower(intakeslidepower);
+            leftintakeslide.setPower(-intakeslidepower);
+            if (gamepad2.left_bumper) {
+                rightintake.setPower(1);
+                leftintake.setPower(-1);
+            } else if (gamepad2.right_bumper) {
+                rightintake.setPower(-1);
+                leftintake.setPower(1);
+            } else {
+                rightintake.setPower(0);
+                leftintake.setPower(0);
+            }
+
+
+            double axial = -gamepad1.left_stick_y;
+            //axial is forward/backward
+            double lateral = -gamepad1.left_stick_x;
+            //lateral is left to right
+            double yaw = 0.5 * gamepad1.right_stick_x;
+            //yaw is angle
+
+
+            double leftFrontPower = axial - lateral + yaw;
+            double rightFrontPower = axial + lateral - yaw;
+            double leftBackPower = axial + lateral + yaw;
+            double rightBackPower = axial - lateral - yaw;
+
+
+            backright.setPower(rightBackPower);
+            backleft.setPower(leftBackPower);
+            frontright.setPower(rightFrontPower);
+            frontleft.setPower(leftFrontPower);
+
+
         }
 
+
+    }
+}

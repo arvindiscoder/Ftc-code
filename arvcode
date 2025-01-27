@@ -1,195 +1,126 @@
 package org.firstinspires.ftc.teamcode;
-
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
+import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
-import org.firstinspires.ftc.robotcore.external.navigation.Pose2D;
-
-public class test extends LinearOpMode {
-
-
-    private DcMotor backleft = null;
-    private DcMotor frontleft = null;
-    private DcMotor backright = null;
-    private DcMotor frontright = null;
-
-    GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
-
-    double oldTime = 0;
+@Config
+@TeleOp(name = "arvauto", group = "auto")
+public class ArvindTelop extends LinearOpMode{
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor leftFrontDrive = null;
+    private DcMotor leftBackDrive = null;
+    private DcMotor rightFrontDrive = null;
+    private DcMotor rightBackDrive = null;
+    private DcMotor specimenslide = null;
+    double targetpositon;
+    double target2;
 
 
-    double axial = 0;
-    //axial is forward/backward
-    double lateralval = 0;
-    //lateralval is left to right
-    double yaw = 0;
-    double x = 0;
-    double y = 0;
-    double a = 0;
 
-    @Override
+
+
+
+
+    double axial;
+    double lateral;
+    double yaw;
+    double left_trigger;
+    double right_trigger;
+
+
+
     public void runOpMode(){
 
-        odo = hardwareMap.get(GoBildaPinpointDriver.class, "odocomp");
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "backleft");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "frontleft");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontright");
+        rightBackDrive = hardwareMap.get(DcMotor.class,"backright");
+        specimenslide = hardwareMap.get(DcMotor.class,"specimenslide");
 
-        backright = hardwareMap.get(DcMotor.class, "frontright");
-        frontright = hardwareMap.get(DcMotor.class, "backright");
-        backleft = hardwareMap.get(DcMotor.class, "frontleft");
-        frontleft = hardwareMap.get(DcMotor.class, "backleft");
+        specimenslide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        specimenslide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
 
-        frontleft.setDirection(DcMotor.Direction.REVERSE);
-        frontright.setDirection(DcMotor.Direction.FORWARD);
-        backleft.setDirection(DcMotor.Direction.REVERSE);
-        backright.setDirection(DcMotor.Direction.FORWARD);
-        /*
-        Set the odometry pod positions relative to the point that the odometry computer tracks around.
-        The X pod offset refers to how far sideways from the tracking point the
-        X (forward) odometry pod is. Left of the center is a positive number,
-        right of center is a negative number. the Y pod offset refers to how far forwards from
-        the tracking point the Y (strafe) odometry pod is. forward of center is a positive number,
-        backwards is a negative number.
-         */
-        odo.setOffsets(-72, -112); //
-        // these are tuned for 3110-0002-0001 Product Insight #1
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
-        /*
-        Set the kind of pods used by your robot. If you're using goBILDA odometry pods, select either
-        the goBILDA_SWINGARM_POD, or the goBILDA_4_BAR_POD.
-        If you're using another kind of odometry pod, uncomment setEncoderResolution and input the
-        number of ticks per mm of your odometry pod.
-         */
-        odo.setEncoderResolution(GoBildaPinpointDriver.GoBildaOdometryPods.goBILDA_4_BAR_POD);
-        //odo.setEncoderResolution(13.26291192);
-
-
-        /*
-        Set the direction that each of the two odometry pods count. The X (forward) pod should
-        increase when you move the robot forward. And the Y (strafe) pod should increase when
-        you move the robot to the left.
-         */
-        odo.setEncoderDirections(GoBildaPinpointDriver.EncoderDirection.FORWARD, GoBildaPinpointDriver.EncoderDirection.FORWARD);
-
-
-        /*
-        Before running the robot, recalibrate the IMU. This needs to happen when the robot is stationary
-        The IMU will automatically calibrate when first powered on, but recalibrating before running
-        the robot is a good idea to ensure that the calibration is "good".
-        resetPosAndIMU will reset the position to 0,0,0 and also recalibrate the IMU.
-        This is recommended before you run your autonomous, as a bad initial calibration can cause
-        an incorrect starting value for x, y, and heading.
-         */
-        //odo.recalibrateIMU();
-        odo.resetPosAndIMU();
-
-        telemetry.addData("Status", "Initialized version 3");
-        telemetry.addData("X offset", odo.getXOffset());
-        telemetry.addData("Y offset", odo.getYOffset());
-        telemetry.addData("Device Version Number:", odo.getDeviceVersion());
-        telemetry.addData("Device Scalar", odo.getYawScalar());
-        telemetry.update();
-
-        // Wait for the game to start (driver presses START)
         waitForStart();
-        resetRuntime();
+        runtime.reset();
+        //left front and back wheels reversed
 
-
-        double direction = -1;
-
-        // run until the end of the match (driver presses STOP)
-        while (opModeIsActive()) {
-
-            /*
-            Request an update from the Pinpoint odometry computer. This checks almost all outputs
-            from the device in a single I2C read.
-             */
-            odo.update();
-
-//
-//            double newTime = getRuntime();
-//            double loopTime = newTime - oldTime;
-//            double frequency = 1 / loopTime;
-//            oldTime = newTime;
-//
-//            Pose2D pos = odo.getPosition();
-//            String data = String.format(Locale.US, "{X: %.3f, Y: %.3f, H: %.3f}", pos.getX(DistanceUnit.MM), pos.getY(DistanceUnit.MM), pos.getHeading(AngleUnit.DEGREES));
-//            telemetry.addData("Position", data);
-//
-//            /*
-//            gets the current Velocity (x & y in mm/sec and heading in degrees/sec) and prints it.
-//             */
-//            Pose2D vel = odo.getVelocity();
-//            String velocity = String.format(Locale.US, "{XVel: %.3f, YVel: %.3f, HVel: %.3f}", vel.getX(DistanceUnit.MM), vel.getY(DistanceUnit.MM), vel.getHeading(AngleUnit.DEGREES));
-//            telemetry.addData("Velocity", velocity);
-//
-//            /*
-//            Gets the Pinpoint device status. Pinpoint can reflect a few states. But we'l   l primarily see
-//            READY: the device is working as normal
-//            CALIBRATING: the device is calibrating and outputs are put on hold
-//            NOT_READY: the device is resetting from scratch. This should only happen after a power-cycle
-//            FAULT_NO_PODS_DETECTED - the device does not detect any pods plugged in
-//            FAULT_X_POD_NOT_DETECTED - The device does not detect an X pod plugged in
-//            FAULT_Y_POD_NOT_DETECTED - The device does not detect a Y pod plugged in
-//            */
-//            telemetry.addData("Status", odo.getDeviceStatus());
-//            telemetry.addData("Pinpoint Frequency", odo.getFrequency()); //prints/gets the current refresh rate of the Pinpoint
-//            telemetry.addData("REV Hub Frequency: ", frequency); //prints the control system refresh rate
-//            //telemetry.update();
-
-            // part of the code where we write the movements
-
-
-            // part of the code whewre those movements run
-
-            Pose2D pos = odo.getPosition();
-
-            double xdrivepower = -0.005;
-            double ydrivepower = -0.005;
-            double headingdrivepower = 0.005;
-
-            double xerror = pos.getX(DistanceUnit.MM) - x;
-            double yerror = pos.getY(DistanceUnit.MM) - y;
-            double aerror = pos.getHeading(AngleUnit.DEGREES) - a;
+        while (opModeIsActive()){
+            axial = gamepad1.left_stick_y;
+            //sets the axial control on the controller
+            lateral = gamepad1.left_stick_x;
+            //sets the lateral control on the controller
+            yaw = gamepad1.right_stick_x;
+            //sets the yaw control on the controller
 
 
 
 
 
-            telemetry.addData(Double.toString(xerror), "xerror");
-            telemetry.addData(Double.toString(yerror), "yerror");
-            telemetry.addData(Double.toString(aerror), "aerror");
 
 
-/* axial = x
-lateralval = y
-yaw = a
- */
-            axial = xdrivepower * xerror;
-            lateralval = ydrivepower * yerror;
-            yaw = headingdrivepower * aerror;
 
-            telemetry.addData(Double.toString(axial), "axial");
-            telemetry.addData(Double.toString(lateralval), "lateral");
-            telemetry.addData(Double.toString(yaw), "yaw");
+
+            telemetry.addData("axial", Double.toString(axial));
+            telemetry.addData("lateral", Double.toString(lateral));
+            telemetry.addData("Yaw", Double.toString(yaw));
+
+//            leftFrontDrive.setPower(axial-lateral+yaw);
+//            leftBackDrive.setPower(axial+lateral+yaw);
+//            rightFrontDrive.setPower(-axial+lateral+yaw);
+//            rightBackDrive.setPower(-axial-lateral+yaw);
+            left_trigger = gamepad1.left_trigger;
+            //sets the left trigger control on the controller
+            right_trigger = gamepad1.right_trigger;
+            //sets the right trigget control on the controller
+         double divisor = 100;
+         double controllersensitivity = 1.1;
+
+            if (gamepad2.right_stick_y > 0.1) {
+                targetpositon = targetpositon+(controllersensitivity*gamepad2.right_stick_y);
+               // sleep(1000);
+                specimenslide.setPower(targetpositon-specimenslide.getCurrentPosition()/divisor);
+
+            }else if(gamepad2.right_stick_y < 0.1){
+                targetpositon = targetpositon+(controllersensitivity*gamepad2.right_stick_y);
+              //  sleep(1000);
+                specimenslide.setPower(targetpositon-specimenslide.getCurrentPosition()/divisor);
+
+            }else
+                specimenslide.setPower(0);
+
+
+//         targetpositon = targetpositon+(controllersensitivity*gamepad2.right_stick_y);
+//         specimenslide.setPower(targetpositon-specimenslide.getCurrentPosition()/divisor);
+//         specimenslide.setPower(0);
+
+
+
+
+
+
+
+
+            telemetry.addData("position", specimenslide.getCurrentPosition());
             telemetry.update();
 
 
-            double leftFrontPower = axial - lateralval + yaw;
-            double rightFrontPower = axial + lateralval - yaw;
-            double leftBackPower = axial + lateralval + yaw;
-            double rightBackPower = axial - lateralval - yaw;
-//remove while loop when done
+            telemetry.addData("power", Double.toString((target2-specimenslide.getCurrentPosition())/divisor));
+            telemetry.addData("specimenslide", Double.toString(specimenslide.getCurrentPosition()));
+           // telemetry.addData("error", Double.toString(error));
 
 
-            backright.setPower(rightBackPower);
-            backleft.setPower(leftBackPower);
-            frontright.setPower(rightFrontPower);
-            frontleft.setPower(leftFrontPower);
-
-
+            telemetry.update();
 
 
         }
 
-}}
+    }
+}

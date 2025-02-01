@@ -1,111 +1,69 @@
 package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.config.Config;
+import com.acmerobotics.dashboard.telemetry.MultipleTelemetry;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.hardware.rev.RevTouchSensor;
-import com.qualcomm.robotcore.hardware.CRServo;
-import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.util.ElapsedTime;
-//import com.qualcomm.robotcore.
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
-
-
-@Autonomous(name="autnomus ig")
-public class prototype extends LinearOpMode {
-
-    // Declare OpMode members for each of the 4 motors.
+@Config
+@TeleOp(name = "arvauto", group = "auto")
+public class ArvindTelop extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;
     private DcMotor rightFrontDrive = null;
     private DcMotor rightBackDrive = null;
+    private DcMotor specimenslide = null;
+    double static int motorpower=0;
+    double static int targetpositon = 0;
+    double target2;
+    
 
-    private CRServo rightintake;
-    private CRServo leftintake;
-    private DcMotor extension = null;
-    private DcMotor angle = null;
-    private DcMotor hangingAngle = null;
-    private DcMotor hangingExtension = null;
 
-    private RevTouchSensor nehal = null;
+    publie void runOpMode{
+        leftFrontDrive = hardwareMap.get(DcMotor.class, "backleft");
+        leftBackDrive = hardwareMap.get(DcMotor.class, "frontleft");
+        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontright");
+        rightBackDrive = hardwareMap.get(DcMotor.class,"backright");
+        specimenslide = hardwareMap.get(DcMotor.class,"specimenslide");
 
-    @Override
-    public void runOpMode() {
+        specimenslide.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        specimenslide.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+
+        FtcDashboard dashboard = FtcDashboard.getInstance();
+        telemetry = new MultipleTelemetry(telemetry, dashboard.getTelemetry());
 
         waitForStart();
         runtime.reset();
+        //left front and back wheels reversed
+        x=0;
 
-        rightFrontDrive = hardwareMap.get(DcMotor.class, "frontright");
-        leftFrontDrive = hardwareMap.get(DcMotor.class, "fleft");
-        leftBackDrive  = hardwareMap.get(DcMotor.class, "bleft");
-        rightBackDrive = hardwareMap.get(DcMotor.class, "backright");
-        int x = 0;
-        x = x+1;
-
- //       if(x == 2){
-
-            rightFrontDrive.setPower(1);
-        while(opModeIsActive()){
-            double max;
-
-
-            double axial   =  0;
-            double lateral =  0;
-            double yaw     =  0;
-
-            axial = 20;
-
-            sleep(5000);
-           // axial = -20;
-            // axial is forward to backward
-            // lateral is side to side
-            // yaw is angle
-            double leftFrontPower  = axial + lateral + yaw;
-            double rightFrontPower = axial - lateral - yaw;
-            double leftBackPower   = axial - lateral + yaw;
-            double rightBackPower  = axial + lateral - yaw;
-
-
-
-            max = Math.max(Math.abs(leftFrontPower), Math.abs(rightFrontPower));
-            max = Math.max(max, Math.abs(leftBackPower));
-            max = Math.max(max, Math.abs(rightBackPower));
-            max = Math.max(max, Math.abs((gamepad1.right_trigger - gamepad1.left_trigger)*0.5));
-            if (max > 1.0) {
-                leftFrontPower  /= max; //leftFrontPower = leftFrontPower / max
-                rightFrontPower /= max;
-                leftBackPower   /= max;
-                rightBackPower  /= max;
-
-
+        while(opModeIsActive){
+            telementry.addData("motorpower", Double.toString(motorpower));
+            telemetry.addData("Targetposition", double.toString(targetposition));
+            speciposition = specimenslide.getCurrentPosition();
+            specimenslide.setPower(targetpositon-specipsition/100);
+            telemetry.update();
+            if(x==0){
+                leftFrontDrive.setPower(-motorpower);
+                leftBackDrive.setPower(-motorpower);
+                rightFrontDrive.setPower(motorpower);
+                rightBackDrive.setPower(motorpower);
+                sleep(1500);
+                
             }
-
-
-            leftFrontDrive.setPower(leftFrontPower);
-            rightFrontDrive.setPower(rightFrontPower);
-            leftBackDrive.setPower(leftBackPower);
-            rightBackDrive.setPower(rightBackPower);
-
-
-            if(x == 2){
-
-                rightintake.setPower(0.2);
-                leftintake.setPower(-0.2);
-
-            }
-
-
-
-
-            int cameraMonitorViewId = hardwareMap.appContext.getResources().getIdentifier("cameraMonitorViewId", "id", hardwareMap.appContext.getPackageName());
-       //     OpenCvCamera camera = OpenCvCameraFactory.getInstance().createInternalCamera(OpenCvInternalCamera.CameraDirection.BACK, cameraMonitorViewId);
-
         }
-
-
-        }
-
-
-
-
-
     }
+}
+            
+            
+
+
+
+
+
+
+

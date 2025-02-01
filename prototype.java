@@ -23,7 +23,7 @@ public class arvauto extends LinearOpMode{
     
 
 
-    publie void runOpMode{
+    public void runOpMode{
         leftFrontDrive = hardwareMap.get(DcMotor.class, "backleft");
         leftBackDrive = hardwareMap.get(DcMotor.class, "frontleft");
         rightFrontDrive = hardwareMap.get(DcMotor.class, "frontright");

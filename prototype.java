@@ -10,7 +10,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 
 @Config
 @TeleOp(name = "arvauto", group = "auto")
-public class ArvindTelop extends LinearOpMode{
+public class arvauto extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
     private DcMotor leftFrontDrive = null;
     private DcMotor leftBackDrive = null;

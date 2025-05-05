@@ -1,0 +1,105 @@
+package org.firstinspires.ftc.teamcode;
+import com.acmerobotics.dashboard.config.Config;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+
+
+
+@TeleOp(name="innovationsecondcode", group="Linear OpMode")
+@Config
+
+public class Innovationsecondcode extends LinearOpMode {
+
+
+    private ElapsedTime runtime = new ElapsedTime();
+    private DcMotor leftDrive = null;
+    private DcMotor rightDrive = null;
+
+    private DcMotor frontleft = null;
+    private DcMotor frontright = null;
+    private DcMotor backleft = null;
+    private DcMotor backright = null;
+    private DcMotor PIDmotor = null;
+
+    double desiredpos;
+    double currentpos;
+    double gap;
+
+    public static double proportional;
+
+
+    GoBildaPinpointDriver odo; // Declare OpMode member for the Odometry Computer
+
+    @Override
+    public void runOpMode() {
+        telemetry.addData("Status", "Initialized");
+        telemetry.update();
+
+        frontleft  = hardwareMap.get(DcMotor.class, "frontleft");
+        frontright = hardwareMap.get(DcMotor.class, "frontright");
+        backleft= hardwareMap.get(DcMotor.class, "backleft");
+        backright=hardwareMap.get(DcMotor.class,"backright");
+        PIDmotor = hardwareMap.get(DcMotor.class, "PIDmotor");
+
+        // leftDrive.setDirection(fron ;
+        // rightDrive.setDirection(DcMotor.Direction.FORWARD);
+
+        waitForStart();
+        runtime.reset();
+
+
+        while (opModeIsActive()) {
+
+            //pid loop
+            currentpos = PIDmotor.getCurrentPosition();
+
+            double controllersensitivity = 10;
+
+            desiredpos = desiredpos + (gamepad2.right_stick_y*controllersensitivity);
+
+            gap = desiredpos - currentpos;
+
+            proportional = 0.01;
+
+            PIDmotor.setPower(gap*proportional);
+            //pid loop end
+
+            
+
+
+
+            double leftPower;
+            double rightPower;
+
+
+            double axial = gamepad1.left_stick_y;
+            double lateral  =  gamepad1.left_stick_x;
+            double yaw = gamepad1.right_stick_y;
+
+
+
+
+            double psens = 0.001;
+            double desiredpostioon = 10;
+
+
+            frontleft.setPower((axial-lateral-yaw)*0.2);
+            frontright.setPower((axial-lateral+yaw)*0.2);
+            backleft.setPower((axial+lateral-yaw)*0.2);
+            backright.setPower((axial+lateral+yaw)*0.2);
+
+
+
+            // Show the elapsed game time and wheel power.
+            telemetry.addData("Status", "Run Time: " + runtime.toString());
+          //  telemetry.addData("Motors", "left (%.2f), right (%.2f)", leftPower, rightPower);
+            telemetry.update();
+        }
+    }
+}
+
+
+
+
